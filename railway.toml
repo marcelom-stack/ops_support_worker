@@ -1,0 +1,10 @@
+﻿# BCA support Gmail worker — polls support@ and writes ops_support_* on BCA DB.
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/health"
+healthcheckTimeout = 120
+restartPolicyType = "on_failure"
