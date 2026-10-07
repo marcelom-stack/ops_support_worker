@@ -16,12 +16,11 @@ import { matchEmailToBcaUser } from "./userMatcher.js";
 /** Floor so we never miss the backlog while recovering from a stalled ingest. */
 const BACKFILL_FLOOR = new Date("2026-09-01T00:00:00.000Z");
 
-function gmailDateQuery(since: Date): string {
-  const lookback = new Date(since.getTime() - 2 * 24 * 60 * 60 * 1000);
-  const effective = lookback < BACKFILL_FLOOR ? BACKFILL_FLOOR : lookback;
-  const y = effective.getUTCFullYear();
-  const m = String(effective.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(effective.getUTCDate()).padStart(2, "0");
+function gmailDateQuery(_since: Date): string {
+  // Emergency recovery: always scan from BACKFILL_FLOOR, ignore last-inbound watermark.
+  const y = BACKFILL_FLOOR.getUTCFullYear();
+  const m = String(BACKFILL_FLOOR.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(BACKFILL_FLOOR.getUTCDate()).padStart(2, "0");
   return `after:${y}/${m}/${d}`;
 }
 
@@ -33,6 +32,7 @@ async function processMessageBatch(
   let tickets = 0;
 
   const newIds = await filterNewMessageIds(messageIds);
+  console.info(`[ingest] batch ids=${messageIds.length} new=${newIds.length}`);
   if (newIds.length === 0) return { stored, tickets };
 
   const messages = await gmailService.batchGetMessages(newIds);
@@ -99,10 +99,11 @@ export async function runContinuousIngest(): Promise<void> {
 
   const lastInbound = await getLastInboundDate();
   // Do NOT filter to INBOX — support mail is often archived/labeled and vanishes from INBOX.
+  // Broad query: anything not sent by support@ since the backfill floor.
   const inboundStored = await ingestLabel({
     labelIds: [],
     since: lastInbound,
-    extraQuery: `(to:${supportEmail} OR deliveredto:${supportEmail} OR cc:${supportEmail}) -from:${supportEmail}`,
+    extraQuery: `-from:${supportEmail} -in:chats`,
     supportEmail,
   });
 
