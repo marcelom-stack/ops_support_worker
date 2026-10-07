@@ -1,9 +1,11 @@
-﻿{
+{
   "name": "ops-support-worker",
   "private": true,
   "version": "0.1.1",
   "type": "module",
-  "engines": { "node": ">=20.0.0" },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",

@@ -1,4 +1,4 @@
-﻿# ops_support_worker
+ ops_support_worker
 
 Gmail ingest worker for Blink support dashboard (`ops_support_*` on BCA Supabase).
 
