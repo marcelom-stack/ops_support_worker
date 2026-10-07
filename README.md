@@ -1,6 +1,6 @@
- ops_support_worker
+# ops_support_worker
 
-Gmail ingest worker for Blink support dashboard (`ops_support_*` on BCA Supabase).
+Gmail ingest worker for Blink support dashboard (ops_support_* on BCA Supabase).
 
 ## Emergency fix 2026-10-07
 - Inbound poll no longer restricted to INBOX label (archived mail was invisible)
