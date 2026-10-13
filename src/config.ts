@@ -15,7 +15,13 @@ export const config = {
     refreshToken: req("GMAIL_REFRESH_TOKEN"),
     redirectUri: process.env.GMAIL_REDIRECT_URI?.trim() || "http://localhost:3000/oauth2callback",
   },
-  supportEmail: process.env.SUPPORT_EMAIL?.trim() || "support@blinkfinances.com",
+  supportEmail: process.env.SUPPORT_EMAIL?.trim() || "support@zivoneobank.com",
+  /** Legacy + current support addresses (direction detection / filters). */
+  supportEmails: [
+    process.env.SUPPORT_EMAIL?.trim() || "support@zivoneobank.com",
+    "support@zivoneobank.com",
+    "support@blinkfinances.com",
+  ].filter((v, i, a) => !!v && a.findIndex((x) => x.toLowerCase() === v.toLowerCase()) === i),
   pollCron: process.env.SUPPORT_POLL_CRON?.trim() || "*/1 * * * *",
   processing: {
     batchSize: parseInt(process.env.BATCH_SIZE ?? "25", 10),

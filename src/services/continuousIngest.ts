@@ -99,21 +99,25 @@ export async function runContinuousIngest(): Promise<void> {
 
   const lastInbound = await getLastInboundDate();
   // Do NOT filter to INBOX — support mail is often archived/labeled and vanishes from INBOX.
-  // Broad query: anything not sent by support@ since the backfill floor.
+  // Exclude both current + legacy support From addresses.
+  const supportExcludes = config.supportEmails.map((e) => `-from:${e}`).join(" ");
   const inboundStored = await ingestLabel({
     labelIds: [],
     since: lastInbound,
-    extraQuery: `-from:${supportEmail} -in:chats`,
+    extraQuery: `${supportExcludes} -in:chats`,
     supportEmail,
   });
 
-  const lastOutbound = await getLastOutboundDate(supportEmail);
-  const outboundStored = await ingestLabel({
-    labelIds: ["SENT"],
-    since: lastOutbound,
-    extraQuery: `from:${supportEmail}`,
-    supportEmail,
-  });
+  let outboundStored = 0;
+  for (const fromAddr of config.supportEmails) {
+    const lastOutbound = await getLastOutboundDate(fromAddr);
+    outboundStored += await ingestLabel({
+      labelIds: ["SENT"],
+      since: lastOutbound,
+      extraQuery: `from:${fromAddr}`,
+      supportEmail,
+    });
+  }
 
   await pool.query(
     `

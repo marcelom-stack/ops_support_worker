@@ -130,8 +130,13 @@ export function parseGmailMessage(
     : null;
   const dateSent = parseDate(headers.date);
   const fromEmail = fromParsed?.email ?? null;
+  const supportSet = new Set(
+    [supportEmail, "support@zivoneobank.com", "support@blinkfinances.com"].map((e) =>
+      e.toLowerCase(),
+    ),
+  );
   const direction =
-    fromEmail?.toLowerCase() === supportEmail.toLowerCase() ? "outbound" : "inbound";
+    fromEmail && supportSet.has(fromEmail.toLowerCase()) ? "outbound" : "inbound";
 
   return {
     gmail_message_id: gmailMessage.id!,

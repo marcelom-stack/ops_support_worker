@@ -20,7 +20,7 @@ app.get("/gmail-diagnostic", async (_req, res) => {
     const profile = await gmail.users.getProfile({ userId: "me" });
     const afterOct3 = await gmail.users.messages.list({
       userId: "me",
-      q: "after:2026/10/03 -from:support@blinkfinances.com",
+      q: `after:2026/10/03 -from:${config.supportEmail}`,
       maxResults: 5,
     });
     const inInbox = await gmail.users.messages.list({
@@ -30,7 +30,7 @@ app.get("/gmail-diagnostic", async (_req, res) => {
     });
     const newer = await gmail.users.messages.list({
       userId: "me",
-      q: "newer_than:4d -from:support@blinkfinances.com",
+      q: `newer_than:4d -from:${config.supportEmail}`,
       maxResults: 5,
     });
 
